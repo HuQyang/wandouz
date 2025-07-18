@@ -6,14 +6,17 @@ import douzero.env.env as env
 import douzero.env.env_alpha as env_alpha
 
 def _load_model(position, model_path):
-    if 'weights' in model_path:
-        from douzero.dmc.models import model_dict
-        model = model_dict[position]()
-        model_state_dict = model.state_dict()
-    else:
-        from douzero.dmc.model_alpha import model_dict
-        model = model_dict[position]()
-        model_state_dict = model.state_dict()
+    # if 'weights' in model_path:
+    #     from douzero.dmc.models import model_dict
+    #     model = model_dict[position]()
+    #     model_state_dict = model.state_dict()
+    # else:
+    #     from douzero.dmc.model_alpha import model_dict
+    #     model = model_dict[position]()
+    #     model_state_dict = model.state_dict()
+    from douzero.dmc.models import model_dict
+    model = model_dict[position]()
+    model_state_dict = model.state_dict()
 
     if torch.cuda.is_available():
         pretrained = torch.load(model_path, map_location='cuda:0')
