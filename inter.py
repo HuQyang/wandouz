@@ -71,11 +71,12 @@ def load_models(card_play_model_path_dict):
             players[position] = RandomAgent()
         else:
             # print("card_play_model_path_dict",model_path)
-            if 'weights' in model_path:
-                players[position] = DeepAgent(position, model_path)
-            else:
-                print("model_path", model_path)
-                players[position] = DeepAgent_Alpha(position, model_path)
+            # if 'weights' in model_path:
+            #     players[position] = DeepAgent(position, model_path)
+            # else:
+            #     print("model_path", model_path)
+            #     players[position] = DeepAgent_Alpha(position, model_path)
+            players[position] = DeepAgent(position, model_path)
     return players
 
 # === 自动对局函数 ===
@@ -301,12 +302,12 @@ if __name__ == '__main__':
     ite2 = 1342233600
     ite3 = 679033600
 
-    alpha_ite1 = 334038400
+    alpha_ite1 = 7913600
     
 
-    landlord = f'douzero_checkpoints/douzero/landlord{ite3}.ckpt'
-    landlord_up = f'douzero_checkpoints/douzero/landlord_up{ite3}.ckpt'
-    landlord_down = f'douzero_checkpoints/douzero/landlord_down{ite3}.ckpt'
+    landlord = f'oracle_reward/douzero/landlord{ite3}.ckpt'
+    landlord_up = f'oracle_reward/douzero/landlord_up{ite3}.ckpt'
+    landlord_down = f'oracle_reward/douzero/landlord_down{ite3}.ckpt'
 
     # landlord = f'douzero_checkpoints/douzero/landlord_weights_{ite3}.ckpt'
     # landlord_up = f'../beta/douzero_checkpoints/douzero/landlord_up_{alpha_ite1}.ckpt'
