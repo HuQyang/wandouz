@@ -235,6 +235,8 @@ class FarmerPerfectDou(nn.Module):
                 action = torch.randint(actor_value.shape[0], (1,))[0]
             else:
                 action = torch.argmax(actor_value,dim=0)[0]
+            print("action", action)
+            print("actor_value", actor_value)
 
             return dict(action=action,critic_value=critic_value,actor_value=actor_value)
 
