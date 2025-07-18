@@ -50,7 +50,7 @@ class DeepAgent:
 
         if torch.cuda.is_available():
             z_batch, x_batch,x_addition_batch = z_batch.cuda(), x_batch.cuda(), x_addition_batch.cuda(),
-        y_pred = self.model.forward(z_batch, x_batch, return_value=True)['actor_value']
+        y_pred = self.model.forward(z_batch, x_batch, x_addition_batch,return_value=True)['actor_value']
         y_pred = y_pred.detach().cpu().numpy()
 
         best_action_index = np.argmax(y_pred, axis=0)[0]
