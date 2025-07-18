@@ -99,8 +99,8 @@ class LandlordPerfectDou(nn.Module):
                  imperct_dim = 452,
                  action_dim=1,
                  critic_feature_dim = 452+ACTION_ENCODE_DIM*2,
-                 actor_mlp_sizes=[512,512,512,512,256,128, 1],
-                 critic_mlp_sizes=[512,512,512,512,256,128, 1]):
+                 actor_mlp_sizes=[512,512,512,512,512,512, 1],
+                 critic_mlp_sizes=[512,512,512,512,512,512, 1]):
         super().__init__()
         
         
@@ -176,8 +176,8 @@ class FarmerPerfectDou(nn.Module):
                  imperct_dim = 589,
                  action_dim=1,
                  critic_feature_dim = 589+ACTION_ENCODE_DIM*2,
-                 actor_mlp_sizes=[512,512,512,512,256,128, 1],
-                 critic_mlp_sizes=[512,512,512,512,256,128, 1]):
+                 actor_mlp_sizes=[512,512,512,512,512,512, 1],
+                 critic_mlp_sizes=[512,512,512,512,512,512, 1]):
         super().__init__()
         self.actor_lstm = nn.LSTM(input_size,
                                    lstm_hidden_size,
