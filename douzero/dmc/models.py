@@ -15,7 +15,7 @@ class LandlordLstmModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.lstm = nn.LSTM(ACTION_ENCODE_DIM*3, 128, batch_first=True)
-        self.dense1 = nn.Linear(384+ACTION_ENCODE_DIM + 128, 512)
+        self.dense1 = nn.Linear(38452+ACTION_ENCODE_DIM + 128, 512)
         self.dense2 = nn.Linear(512, 512)
         self.dense3 = nn.Linear(512, 512)
         self.dense4 = nn.Linear(512, 512)
@@ -50,7 +50,7 @@ class FarmerLstmModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.lstm = nn.LSTM(ACTION_ENCODE_DIM*3, 128, batch_first=True)
-        self.dense1 = nn.Linear(521 + ACTION_ENCODE_DIM + 128, 512)
+        self.dense1 = nn.Linear(589 + ACTION_ENCODE_DIM + 128, 512)
         self.dense2 = nn.Linear(512, 512)
         self.dense3 = nn.Linear(512, 512)
         self.dense4 = nn.Linear(512, 512)
@@ -58,8 +58,6 @@ class FarmerLstmModel(nn.Module):
         self.dense6 = nn.Linear(512, 1)
 
     def forward(self, z, x, return_value=False, flags=None):
-        # print("z shape", z.shape)
-        # print("x input shape", x.shape)
         lstm_out, (h_n, _) = self.lstm(z)
         lstm_out = lstm_out[:,-1,:]
         x = torch.cat([lstm_out,x], dim=-1)
@@ -80,10 +78,8 @@ class FarmerLstmModel(nn.Module):
             if flags is not None and flags.exp_epsilon > 0 and np.random.rand() < flags.exp_epsilon:
                 action = torch.randint(x.shape[0], (1,))[0]
             else:
-                # print("x shape", x.shape, torch.argmax(x,dim=0).shape)
                 action = torch.argmax(x,dim=0)[0]
-                # print("action shape", action)
-                # print("x shape", x.shape)
+
             return dict(action=action)
 
 
@@ -120,41 +116,95 @@ class LandlordPerfectDou(nn.Module):
         
 
         # Actor 分支
-        actor_layers = []
-        in_dim = lstm_hidden_size + imperct_dim 
-        for h in actor_mlp_sizes:
-            actor_layers += [nn.Linear(in_dim, h), nn.ReLU()]
-            in_dim = h
-        actor_layers.append(nn.Linear(in_dim, action_dim))
-        self.actor_head = nn.Sequential(*actor_layers)
+        # actor_layers = []
+        # in_dim = lstm_hidden_size + imperct_dim  
+        # for h in actor_mlp_sizes:
+        #     actor_layers += [nn.Linear(in_dim, h), nn.ReLU()]
+        #     in_dim = h
+        # actor_layers.append(nn.Linear(in_dim, action_dim))
+        # self.actor_head = nn.Sequential(*actor_layers)
 
-        # Critic 分支：接收 LSTM 输出 + 完美信息特征
-        critic_layers = []
-        in_dim = lstm_hidden_size + critic_feature_dim
-        for h in critic_mlp_sizes:
-            critic_layers += [nn.Linear(in_dim, h), nn.ReLU()]
-            in_dim = h
-        critic_layers.append(nn.Linear(in_dim, 1))
-        self.critic_head = nn.Sequential(*critic_layers)
+        # # Critic 分支：接收 LSTM 输出 + 完美信息特征
+        # critic_layers = []
+        # in_dim = lstm_hidden_size + critic_feature_dim
+        # for h in critic_mlp_sizes:
+        #     critic_layers += [nn.Linear(in_dim, h), nn.ReLU()]
+        #     in_dim = h
+        # critic_layers.append(nn.Linear(in_dim, 1))
+        # self.critic_head = nn.Sequential(*critic_layers)
+
+        actor_in_dim = lstm_hidden_size + imperct_dim 
+        self.actor_lstm = nn.LSTM(input_size, lstm_hidden_size, batch_first=True)
+        self.dense1 = nn.Linear(actor_in_dim, 512)
+        self.dense2 = nn.Linear(512, 512)
+        self.dense3 = nn.Linear(512, 512)
+        self.dense4 = nn.Linear(512, 512)
+        self.dense5 = nn.Linear(512, 512)
+        self.dense6 = nn.Linear(512, 1)
+
+        critic_in_dim = lstm_hidden_size + critic_feature_dim
+        # print("critic_in_dim", critic_in_dim)
+        self.critic_lstm = nn.LSTM(input_size, lstm_hidden_size, batch_first=True)
+        self.critic_dense1 = nn.Linear(critic_in_dim, 512)
+        self.critic_dense2 = nn.Linear(512, 512)
+        self.critic_dense3 = nn.Linear(512, 512)
+        self.critic_dense4 = nn.Linear(512, 512)
+        self.critic_dense5 = nn.Linear(512, 512)
+        self.critic_dense6 = nn.Linear(512, 1)
 
     def forward(self, z, x, x_addition, return_value=False,flags=None):
-        """
-        incomplete_feats: [B, T, input_size]  不完全信息序列
-        perfect_feats:    [B, critic_feature_dim] 完美信息向量
-        """
+        # """
+        # incomplete_feats: [B, T, input_size]  不完全信息序列
+        # perfect_feats:    [B, critic_feature_dim] 完美信息向量
+        # """
 
+        # lstm_out, _ = self.actor_lstm(z)
+        # lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
+        # emb_act = torch.cat([lstm_out,x], dim=-1)
+        # actor_value = self.actor_head(emb_act)              # [B, action_dim]
+        # # probs  = F.softmax(logits, dim=-1)         # categorical probs
+
+        # lstm_out, _ = self.critic_lstm(z)
+        # lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
+
+        # x_perfect = torch.cat([x, x_addition], dim=-1)
+        # critic_in = torch.cat([lstm_out, x_perfect], dim=-1)
+        # critic_value     = self.critic_head(critic_in).squeeze(-1)  # [B]
         lstm_out, _ = self.actor_lstm(z)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
+        
         emb_act = torch.cat([lstm_out,x], dim=-1)
-        actor_value = self.actor_head(emb_act)              # [B, action_dim]
-        # probs  = F.softmax(logits, dim=-1)         # categorical probs
-
-        lstm_out, _ = self.critic_lstm(z)
-        lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
+        
+        emb_act = self.dense1(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense2(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense3(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense4(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense5(emb_act)
+        emb_act = torch.relu(emb_act)
+        actor_value = self.dense6(emb_act)
+        
+        cri_lstm_out, _ = self.critic_lstm(z)
+        cri_lstm_out = cri_lstm_out[:, -1, :]   # 取最后时刻输出
 
         x_perfect = torch.cat([x, x_addition], dim=-1)
-        critic_in = torch.cat([lstm_out, x_perfect], dim=-1)
-        critic_value     = self.critic_head(critic_in).squeeze(-1)  # [B]
+
+        emb_cri = torch.cat([cri_lstm_out,x_perfect], dim=-1)
+        
+        emb_cri = self.critic_dense1(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense2(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense3(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense4(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense5(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        critic_value = self.critic_dense6(emb_cri)
 
         if return_value:
             return dict(critic_value=critic_value,actor_value=actor_value)
@@ -196,38 +246,78 @@ class FarmerPerfectDou(nn.Module):
 
         # Actor 分支
         actor_layers = []
-        in_dim = lstm_hidden_size + imperct_dim 
-        for h in actor_mlp_sizes:
-            actor_layers += [nn.Linear(in_dim, h), nn.ReLU()]
-            in_dim = h
-        actor_layers.append(nn.Linear(in_dim, action_dim))
-        self.actor_head = nn.Sequential(*actor_layers)
+        actor_in_dim = lstm_hidden_size + imperct_dim
+        # for h in actor_mlp_sizes:
+        #     actor_layers += [nn.Linear(actor_in_dim, h), nn.ReLU()]
+        #     actor_in_dim = h
+        # actor_layers.append(nn.Linear(actor_in_dim, action_dim))
+        # self.actor_head = nn.Sequential(*actor_layers)
+
+        self.actor_lstm = nn.LSTM(input_size, lstm_hidden_size, batch_first=True)
+        self.dense1 = nn.Linear(actor_in_dim, 512)
+        self.dense2 = nn.Linear(512, 512)
+        self.dense3 = nn.Linear(512, 512)
+        self.dense4 = nn.Linear(512, 512)
+        self.dense5 = nn.Linear(512, 512)
+        self.dense6 = nn.Linear(512, 1)
+
+        critic_in_dim = lstm_hidden_size + critic_feature_dim
+        # print("critic_in_dim", critic_in_dim)
+        self.critic_lstm = nn.LSTM(input_size, lstm_hidden_size, batch_first=True)
+        self.critic_dense1 = nn.Linear(critic_in_dim, 512)
+        self.critic_dense2 = nn.Linear(512, 512)
+        self.critic_dense3 = nn.Linear(512, 512)
+        self.critic_dense4 = nn.Linear(512, 512)
+        self.critic_dense5 = nn.Linear(512, 512)
+        self.critic_dense6 = nn.Linear(512, 1)
 
         # Critic 分支：接收 LSTM 输出 + 完美信息特征
-        critic_layers = []
-        in_dim = lstm_hidden_size + critic_feature_dim
-        for h in critic_mlp_sizes:
-            critic_layers += [nn.Linear(in_dim, h), nn.ReLU()]
-            in_dim = h
-        critic_layers.append(nn.Linear(in_dim, 1))
-        self.critic_head = nn.Sequential(*critic_layers)
+        # critic_layers = []
+        # in_dim = lstm_hidden_size + critic_feature_dim
+        # for h in critic_mlp_sizes:
+        #     critic_layers += [nn.Linear(in_dim, h), nn.ReLU()]
+        #     in_dim = h
+        # critic_layers.append(nn.Linear(in_dim, 1))
+        # self.critic_head = nn.Sequential(*critic_layers)
+        
 
     def forward(self, z, x, x_addition, return_value=False, flags=None):
-        
         lstm_out, _ = self.actor_lstm(z)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
-
+        
         emb_act = torch.cat([lstm_out,x], dim=-1)
-        actor_value = self.actor_head(emb_act)              # [B, action_dim]
-
-
-        lstm_out, _ = self.critic_lstm(z)
-        lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
+        
+        emb_act = self.dense1(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense2(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense3(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense4(emb_act)
+        emb_act = torch.relu(emb_act)
+        emb_act = self.dense5(emb_act)
+        emb_act = torch.relu(emb_act)
+        actor_value = self.dense6(emb_act)
+        
+        cri_lstm_out, _ = self.critic_lstm(z)
+        cri_lstm_out = cri_lstm_out[:, -1, :]   # 取最后时刻输出
 
         x_perfect = torch.cat([x, x_addition], dim=-1)
-        critic_in = torch.cat([lstm_out, x_perfect], dim=-1)
-        critic_value     = self.critic_head(critic_in).squeeze(-1)  # [B]
 
+        emb_cri = torch.cat([cri_lstm_out,x_perfect], dim=-1)
+        
+        emb_cri = self.critic_dense1(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense2(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense3(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense4(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        emb_cri = self.critic_dense5(emb_cri)
+        emb_cri = torch.relu(emb_cri)
+        critic_value = self.critic_dense6(emb_cri)
+       
         if return_value:
             return dict(critic_value=critic_value,actor_value=actor_value)
         else:
@@ -235,9 +325,7 @@ class FarmerPerfectDou(nn.Module):
                 action = torch.randint(actor_value.shape[0], (1,))[0]
             else:
                 action = torch.argmax(actor_value,dim=0)[0]
-            print("action", action)
-            print("actor_value", actor_value)
-
+           
             return dict(action=action,critic_value=critic_value,actor_value=actor_value)
 
 def compute_gae_advantage(rewards, values, dones, gamma=1.0, lam=0.95):

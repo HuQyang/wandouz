@@ -603,12 +603,16 @@ def _cards2array(list_cards):
             
         if card < 20:
             matrix[0:4, Card2Column[card]] = NumOnes2Array[num_times]
-            if is_mastercard(card):  
-                matrix[4, Card2Column[card]] = 1
+            # if is_mastercard(card):  
+            #     matrix[4, Card2Column[card]] = 1
         elif card == 20:
             jokers[0] = 1
         elif card == 30:
             jokers[1] = 1
+    # print("global_mastercard_values: ", global_mastercard_values)
+    for mcard in global_mastercard_values:
+        matrix[4, Card2Column[mcard]] = 1
+    # print("matrix: ", global_mastercard_values,matrix.shape, matrix)
     return np.concatenate((matrix.flatten('F'), jokers))
 
 
@@ -677,6 +681,8 @@ def _get_obs_landlord(infoset):
     my_action_batch = np.zeros(my_handcards_batch.shape)
     for j, action in enumerate(infoset.legal_actions):
         my_action_batch[j, :] = _cards2array(action)
+    # print("my_action_batch : ",my_action_batch.shape, my_action_batch)
+
 
     landlord_up_num_cards_left = _get_one_hot_array(
         infoset.num_cards_left_dict['landlord_up'], 17)
@@ -876,6 +882,7 @@ def _get_obs_landlord_up(infoset):
                              control_flag))
     z = _action_seq_list2array(_process_action_seq(
         infoset.card_play_action_seq))
+
     z_batch = np.repeat(
         z[np.newaxis, :, :],
         num_legal_actions, axis=0)
@@ -925,7 +932,7 @@ def _get_obs_landlord_down(infoset):
     my_action_batch = np.zeros(my_handcards_batch.shape)
     for j, action in enumerate(infoset.legal_actions):
         my_action_batch[j, :] = _cards2array(action)
-
+    
     last_landlord_action = _cards2array(
         infoset.last_move_dict['landlord'])
     last_landlord_action_batch = np.repeat(

@@ -2,11 +2,16 @@ from douzero.env.utils import MIN_SINGLE_CARDS, MIN_PAIRS, MIN_TRIPLES, select
 import collections
 import itertools
 from itertools import combinations_with_replacement, combinations, permutations
+from functools import lru_cache
+from collections import Counter
+from typing import Tuple, List
 
 class MovesGener(object):
     """
     This is for generating the possible combinations
     """
+    ALL_RANKS = [3,4,5,6,7,8,9,10,11,12,13,14,15,17,20,30]
+
     def __init__(self, cards_list,mastercard_list):
         self.cards_list = cards_list
         self.cards_dict = collections.defaultdict(int)
@@ -17,11 +22,6 @@ class MovesGener(object):
 
         for i in self.cards_list:
             self.cards_dict[i] += 1
-            
-        # Remove items with zero count
-        # zero_keys = [k for k, v in self.cards_dict.items() if v == 0]
-        # for k in zero_keys:
-        #     del self.cards_dict[k]
             
         self.mastercard_count = sum(self.cards_dict[m] for m in mastercard_list)
 
@@ -35,6 +35,7 @@ class MovesGener(object):
         self.gen_type_4_bomb()
         self.final_bomb_moves = []
         self.gen_type_5_king_bomb()
+        self.ALL_RANKS = [3,4,5,6,7,8,9,10,11,12,13,14,15,17,20,30]
 
     def _gen_serial_moves(self, cards, min_serial, repeat=1, repeat_num=0):
         if 0 < repeat_num < min_serial:
@@ -416,6 +417,35 @@ class MovesGener(object):
         moves.extend(self.gen_type_13_4_2())
         moves.extend(self.gen_type_14_4_22())
         return moves
+    
+    @lru_cache(maxsize=None)
+    def generate_moves_from_counts(self, hand_counts: Tuple[int, ...]) -> Tuple[Tuple[int, ...], ...]:
+        """
+        输入 hand_counts：长度 = len(ALL_RANKS) 的 counts tuple，
+        输出 next_states：每个合法动作减去后得到的 counts tuple。
+        """
+        # 1) 把 counts tuple “解码”成列表，仅做一次
+        hand_list = []
+        for r, cnt in zip(self.ALL_RANKS, hand_counts):
+            hand_list += [r] * cnt
+
+        # 2) 调用原逻辑生成 Counter 列表
+        moves = self.gen_moves()
+
+        # 3) 把每个 move 转成 counts tuple，并去掉非法结果
+        next_states = []
+        for mv in moves:
+            mv_cnt = mv if isinstance(mv, Counter) else Counter(mv)
+            new_counts = tuple(
+                hc - mv_cnt.get(r, 0)
+                for hc, r in zip(hand_counts, self.ALL_RANKS)
+            )
+            if all(x >= 0 for x in new_counts):
+                next_states.append(new_counts)
+
+        # 4) 去重并返回 tuple
+        unique = set(next_states)
+        return tuple(unique)
 
     def unique_unordered_pairs(self,lst,num):
         return list({tuple(sorted(pair)) for pair in itertools.combinations(lst, num)})
