@@ -84,6 +84,7 @@ def learn(position,
         stats = {
             'mean_episode_return_'+position: torch.mean(torch.stack([_r for _r in mean_episode_return_buf[position]])).item(),
             'loss_'+position: total_loss.item(),
+            'actor_loss_'+position: actor_loss.mean().item(),
             'mean_advantage_'+position: torch.mean(advantage).item(),
         }
         
