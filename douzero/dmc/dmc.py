@@ -16,7 +16,7 @@ from .models import Model
 from .utils import get_batch, log, create_env, create_buffers, create_optimizers, act
 
 from torch.distributions import Categorical
-# import wandb
+import wandb
 
 
 mean_episode_return_buf = {p:deque(maxlen=100) for p in ['landlord', 'landlord_up', 'landlord_down']}
@@ -182,23 +182,23 @@ def train(flags):
         log.info(f"Resuming preempted job, current stats:\n{stats}")
     
     # Initialize wandb for logging
-    # wandb.init(
-    #     project="zero-training",
-    #     config={
-    #         "unroll_length": T,
-    #         "batch_size": B,
-    #         "num_actors": flags.num_actors,
-    #         "total_frames": flags.total_frames
-    #     }
-    # )
+    wandb.init(
+        project="zero-training",
+        config={
+            "unroll_length": T,
+            "batch_size": B,
+            "num_actors": flags.num_actors,
+            "total_frames": flags.total_frames
+        }
+    )
 
     # Create a custom logger that also logs to wandb
-    # class WandbLogger:
-    #     def log(self, stats_dict):
-    #         # Log all stats to wandb
-    #         wandb.log(stats_dict)
+    class WandbLogger:
+        def log(self, stats_dict):
+            # Log all stats to wandb
+            wandb.log(stats_dict)
             
-    # plogger = WandbLogger()
+    plogger = WandbLogger()
 
     # Starting actor processes
     for device in device_iterator:
@@ -301,9 +301,9 @@ def train(flags):
                      position_fps['landlord_down'],
                      pprint.pformat(stats))
             
-            # wandb.log({
-            #     **stats  # Unpack all stats keys and values
-            # })
+            wandb.log({
+                **stats  # Unpack all stats keys and values
+            })
 
     except KeyboardInterrupt:
         return 

@@ -4,7 +4,7 @@ from douzero.dmc import parser, train
 
 if __name__ == '__main__':
     flags = parser.parse_args()
-    flags.num_actors = 9
+    flags.num_actors = 10
     flags.num_threads = 128
     flags.load_model = False
     flags.batch_size = 32
