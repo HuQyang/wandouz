@@ -141,6 +141,7 @@ class LandlordPerfectDou(nn.Module):
         self.dense4 = nn.Linear(512, 512)
         self.dense5 = nn.Linear(512, 512)
         self.dense6 = nn.Linear(512, 1)
+        
 
         critic_in_dim = lstm_hidden_size + critic_feature_dim
         # print("critic_in_dim", critic_in_dim)
@@ -186,6 +187,7 @@ class LandlordPerfectDou(nn.Module):
         emb_act = self.dense5(emb_act)
         emb_act = torch.relu(emb_act)
         actor_value = self.dense6(emb_act)
+        actor_value = torch.sigmoid(actor_value)  # Ensure the output is in [0, 1] range
         
         cri_lstm_out, _ = self.critic_lstm(z)
         cri_lstm_out = cri_lstm_out[:, -1, :]   # 取最后时刻输出
