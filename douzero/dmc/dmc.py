@@ -53,7 +53,8 @@ def learn(position,
     with lock:
         learner_outputs = model(obs_z, obs_x,obs_x_addition, return_value=True)
         v_pred = learner_outputs['critic_value'].squeeze(-1)  # from critic
-        actor_value = learner_outputs['actor_value'].squeeze(-1)  # from critic
+        actor_value = learner_outputs['actor_value'].squeeze(-1).clamp(-500, 500)  # from critic
+        print("v_pred", v_pred.shape, actor_value.shape)  # Debugging line to check v_pred shape and values
         # loss = compute_loss(learner_outputs['logits'], target)
 
         with torch.no_grad():
@@ -63,10 +64,14 @@ def learn(position,
         # v_target = target
         # advantage = obs_advantage
 
-        # logits = learner_outputs['logits']  # from actor
+        # logits = learner_outputs['actor_value'].squeeze(-1)  # from actor
+        # print("logits", logits.shape, logits[-67:])  # Debugging line to check logits shape and values
         # dist = Categorical(logits=logits)
+        # print("dist", dist.probs.shape, dist.probs[-67:])  # Debugging line to check distribution shape and values
         # action = dist.sample()
+        # print("action", action.shape, action)
         # log_prob = dist.log_prob(action)
+        # print("log_prob", log_prob.shape)  # Debugging line to check log_prob shape and values
 
         # actor loss
         actor_loss = -actor_value * advantage
@@ -276,7 +281,7 @@ def train(flags):
             start_frames = frames
             position_start_frames = {k: position_frames[k] for k in position_frames}
             start_time = timer()
-            time.sleep(120)
+            time.sleep(60)
 
             if timer() - last_checkpoint_time > flags.save_interval * 60:  
                 checkpoint(frames)
