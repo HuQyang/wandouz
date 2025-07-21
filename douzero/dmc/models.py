@@ -173,6 +173,7 @@ class LandlordPerfectDou(nn.Module):
         # critic_value     = self.critic_head(critic_in).squeeze(-1)  # [B]
         if mode == 'train':
             lstm_out, _ = self.actor_lstm(z)
+            print('mode ', mode)
         else:
             lstm_out, _ = self.critic_lstm(z)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
