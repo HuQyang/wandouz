@@ -176,6 +176,7 @@ class LandlordPerfectDou(nn.Module):
             print('mode ', mode)
         else:
             lstm_out, _ = self.critic_lstm(z)
+            print("mode",mode)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
         
         emb_act = torch.cat([lstm_out,x], dim=-1)
