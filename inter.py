@@ -82,7 +82,7 @@ def load_models(card_play_model_path_dict,mode='eval'):
 
 # === 自动对局函数 ===
 def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_action=False,device=torch.device("cuda")):
-    players = load_models(card_play_model_path_dict,device,mode='eval')
+    players = load_models(card_play_model_path_dict,mode='eval')
     if 'weight' in card_play_model_path_dict:
         import douzero.env.game as game
         env = game.GameEnv(players, show_action=show_action)
