@@ -64,7 +64,7 @@ def convert_move_type_to_readable(move_type):
     return move_type_dict.get(move_type, 0)
 
 # === 加载模型 ===
-def load_models(card_play_model_path_dict,device):
+def load_models(card_play_model_path_dict,mode='eval'):
     players = {}
     for position in ['landlord', 'landlord_up', 'landlord_down']:
         model_path = card_play_model_path_dict[position]
@@ -77,12 +77,12 @@ def load_models(card_play_model_path_dict,device):
             # else:
             #     print("model_path", model_path)
             #     players[position] = DeepAgent_Alpha(position, model_path)
-            players[position] = DeepAgent(position, model_path,device)
+            players[position] = DeepAgent(position, model_path,mode)
     return players
 
 # === 自动对局函数 ===
 def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_action=False,device=torch.device("cuda")):
-    players = load_models(card_play_model_path_dict,device)
+    players = load_models(card_play_model_path_dict,device,mode='eval')
     if 'weight' in card_play_model_path_dict:
         import douzero.env.game as game
         env = game.GameEnv(players, show_action=show_action)
@@ -123,7 +123,7 @@ def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_
 
 # === 主函数 ===
 def play_interactive_game(card_play_data, card_play_model_path_dict, human_role='landlord_up',show_card=True):
-    players = load_models(card_play_model_path_dict)
+    players = load_models(card_play_model_path_dict,mode='eval')
 
     print("========== 初始牌局：==========")
     for k,v in card_play_data.items():
@@ -301,7 +301,7 @@ if __name__ == '__main__':
 
     ite1 = 773708800
     ite2 = 1342233600
-    ite3 = 11142400
+    ite3 = 14054400
 
     alpha_ite1 = 7913600
     

@@ -153,7 +153,7 @@ class LandlordPerfectDou(nn.Module):
         self.critic_dense5 = nn.Linear(512, 512)
         self.critic_dense6 = nn.Linear(512, 1)
 
-    def forward(self, z, x, x_addition, return_value=False,flags=None):
+    def forward(self, z, x, x_addition, return_value=False,flags=None,mode='train'):
         # """
         # incomplete_feats: [B, T, input_size]  不完全信息序列
         # perfect_feats:    [B, critic_feature_dim] 完美信息向量
@@ -171,7 +171,10 @@ class LandlordPerfectDou(nn.Module):
         # x_perfect = torch.cat([x, x_addition], dim=-1)
         # critic_in = torch.cat([lstm_out, x_perfect], dim=-1)
         # critic_value     = self.critic_head(critic_in).squeeze(-1)  # [B]
-        lstm_out, _ = self.actor_lstm(z)
+        if mode == 'train':
+            lstm_out, _ = self.actor_lstm(z)
+        else:
+            lstm_out, _ = self.critic_lstm(z)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
         
         emb_act = torch.cat([lstm_out,x], dim=-1)
@@ -283,8 +286,11 @@ class FarmerPerfectDou(nn.Module):
         # self.critic_head = nn.Sequential(*critic_layers)
         
 
-    def forward(self, z, x, x_addition, return_value=False, flags=None):
-        lstm_out, _ = self.actor_lstm(z)
+    def forward(self, z, x, x_addition, return_value=False, flags=None,mode='train'):
+        if mode == 'train':
+            lstm_out, _ = self.actor_lstm(z)
+        else:
+            lstm_out, _ = self.critic_lstm(z)
         lstm_out = lstm_out[:, -1, :]   # 取最后时刻输出
         
         emb_act = torch.cat([lstm_out,x], dim=-1)
@@ -319,7 +325,7 @@ class FarmerPerfectDou(nn.Module):
         emb_cri = self.critic_dense5(emb_cri)
         emb_cri = torch.relu(emb_cri)
         critic_value = self.critic_dense6(emb_cri)
-       
+
         if return_value:
             return dict(critic_value=critic_value,actor_value=actor_value)
         else:
