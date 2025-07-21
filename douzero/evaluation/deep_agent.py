@@ -53,9 +53,9 @@ class DeepAgent:
         if len(infoset.legal_actions) == 1:
             return infoset.legal_actions[0]
 
-        # if torch.cuda.is_available():
-        #     z_batch, x_batch,x_addition_batch = z_batch.cuda(), x_batch.cuda(), x_addition_batch.cuda(),
-        z_batch, x_batch,x_addition_batch = z_batch.to(self.device), x_batch.to(self.device), x_addition_batch.to(self.device),
+        if torch.cuda.is_available():
+            z_batch, x_batch,x_addition_batch = z_batch.cuda(), x_batch.cuda(), x_addition_batch.cuda(),
+        # z_batch, x_batch,x_addition_batch = z_batch.to(self.device), x_batch.to(self.device), x_addition_batch.to(self.device),
         
         y_pred = self.model.forward(z_batch, x_batch, x_addition_batch,return_value=True,mode=self.mode)['actor_value']
         y_pred = y_pred.detach().cpu().numpy()
