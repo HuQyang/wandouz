@@ -37,7 +37,7 @@ log.setLevel(logging.INFO)
 Buffers = typing.Dict[str, typing.List[torch.Tensor]]
 
 def create_env(flags):
-    return Env(flags.objective,flags.show_action)
+    return Env(flags.objective,flags.show_action,flags.use_oracle_reward)
 
 def  get_batch(free_queue,
               full_queue,

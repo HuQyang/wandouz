@@ -62,5 +62,6 @@ parser.add_argument('--use_oracle_reward', default=True, type=bool,
 
 
 parser.add_argument('--show_action', default=False, help='Show action in evaluation mode')
+parser.add_argument('--use_oracle_reward', default=False, help='true if use oracle reward')
 parser.add_argument('--save_interval_frames', default=2999999, type=int,
                     help='Time interval (in minutes) at which to save the model')    
