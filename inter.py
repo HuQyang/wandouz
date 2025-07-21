@@ -332,4 +332,4 @@ if __name__ == '__main__':
     print("\n 斗地主人机对战开始！你扮演地主。")
     print(f'load ckpt {landlord}')
     # play_interactive_game(card_play_data, card_play_model_path_dict, human_role='landlord_up')
-    play_auto_game(card_play_data, card_play_model_path_dict,device=torch.device("cuda"))
+    play_auto_game(card_play_data, card_play_model_path_dict,mode='train')
