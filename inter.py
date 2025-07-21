@@ -123,7 +123,7 @@ def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_
 
 # === 主函数 ===
 def play_interactive_game(card_play_data, card_play_model_path_dict, human_role='landlord_up',show_card=True):
-    players = load_models(card_play_model_path_dict,mode='eval')
+    players = load_models(card_play_model_path_dict,mode='train')
 
     print("========== 初始牌局：==========")
     for k,v in card_play_data.items():
