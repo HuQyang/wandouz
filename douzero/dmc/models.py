@@ -217,9 +217,9 @@ class LandlordPerfectDou(nn.Module):
             return dict(critic_value=critic_value,actor_value=actor_value)
         else:
             if flags is not None and flags.exp_epsilon > 0 and np.random.rand() < flags.exp_epsilon:
-                action = torch.randint(actor_value.shape[0], (1,))[0]
+                action = torch.randint(critic_value.shape[0], (1,))[0]
             else:
-                action = torch.argmax(actor_value,dim=0)[0]
+                action = torch.argmax(critic_value,dim=0)[0]
 
             return dict(action=action,critic_value=critic_value,actor_value=actor_value)
 
@@ -332,9 +332,9 @@ class FarmerPerfectDou(nn.Module):
             return dict(critic_value=critic_value,actor_value=actor_value)
         else:
             if flags is not None and flags.exp_epsilon > 0 and np.random.rand() < flags.exp_epsilon:
-                action = torch.randint(actor_value.shape[0], (1,))[0]
+                action = torch.randint(critic_value.shape[0], (1,))[0]
             else:
-                action = torch.argmax(actor_value,dim=0)[0]
+                action = torch.argmax(critic_value,dim=0)[0]
            
             return dict(action=action,critic_value=critic_value,actor_value=actor_value)
 
