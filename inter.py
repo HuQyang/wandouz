@@ -8,6 +8,7 @@ from douzero.env.move_generator import MovesGener
 from douzero.evaluation.deep_agent import DeepAgent, DeepAgent_Alpha
 from douzero.evaluation.random_agent import RandomAgent
 import time 
+import torch
 
 # === 用户输入牌转换 ===
 def parse_card_input(card_str):
@@ -63,7 +64,7 @@ def convert_move_type_to_readable(move_type):
     return move_type_dict.get(move_type, 0)
 
 # === 加载模型 ===
-def load_models(card_play_model_path_dict):
+def load_models(card_play_model_path_dict,device):
     players = {}
     for position in ['landlord', 'landlord_up', 'landlord_down']:
         model_path = card_play_model_path_dict[position]
@@ -76,12 +77,12 @@ def load_models(card_play_model_path_dict):
             # else:
             #     print("model_path", model_path)
             #     players[position] = DeepAgent_Alpha(position, model_path)
-            players[position] = DeepAgent(position, model_path)
+            players[position] = DeepAgent(position, model_path,device)
     return players
 
 # === 自动对局函数 ===
-def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_action=False):
-    players = load_models(card_play_model_path_dict)
+def play_auto_game(card_play_data, card_play_model_path_dict, verbose=True,show_action=False,device=torch.device("cuda")):
+    players = load_models(card_play_model_path_dict,device)
     if 'weight' in card_play_model_path_dict:
         import douzero.env.game as game
         env = game.GameEnv(players, show_action=show_action)
@@ -331,4 +332,4 @@ if __name__ == '__main__':
     print("\n 斗地主人机对战开始！你扮演地主。")
     print(f'load ckpt {landlord}')
     # play_interactive_game(card_play_data, card_play_model_path_dict, human_role='landlord_up')
-    play_auto_game(card_play_data, card_play_model_path_dict)
+    play_auto_game(card_play_data, card_play_model_path_dict,device=torch.device("cpu"))

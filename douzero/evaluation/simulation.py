@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import pickle
 from douzero.evaluation.deep_agent import DeepAgent, DeepAgent_Alpha
+import torch
 
 # def load_card_play_models(card_play_model_path_dict):
 #     players = {}
@@ -88,7 +89,7 @@ from douzero.evaluation.deep_agent import DeepAgent, DeepAgent_Alpha
 #     print('landlord : Farmers - {} : {}'.format(num_landlord_scores / num_total_wins, 2 * num_farmer_scores / num_total_wins)) 
 
 
-def load_card_play_models(card_play_model_path_dict):
+def load_card_play_models(card_play_model_path_dict,device):
     players = {}
 
     for position in ['landlord', 'landlord_up', 'landlord_down']:
@@ -100,14 +101,15 @@ def load_card_play_models(card_play_model_path_dict):
             from .random_agent import RandomAgent
             players[position] = RandomAgent()
         else:
-            if 'weights' in model_path:
-                players[position] = DeepAgent(position, model_path)
-            else:
-                print("model_path", model_path)
-                players[position] = DeepAgent_Alpha(position, model_path)
+            # if 'weights' in model_path:
+            #     players[position] = DeepAgent(position, model_path,device)
+            # else:
+            #     print("model_path", model_path)
+            #     players[position] = DeepAgent_Alpha(position, model_path,device)
+            players[position] = DeepAgent(position, model_path,device)
     return players
 
-def mp_simulate(card_play_data_list, card_play_model_path_dict, q, verbose=True,show_action=True):
+def mp_simulate(card_play_data_list, card_play_model_path_dict, q, verbose=True,show_action=True,device=torch.device("cuda")):
     # Set resource limits for this process
     # set_process_limits()
     
@@ -121,7 +123,7 @@ def mp_simulate(card_play_data_list, card_play_model_path_dict, q, verbose=True,
         original_stdout = sys.stdout
         sys.stdout = StringIO()  # Redirect stdout to nowhere
     
-    players = load_card_play_models(card_play_model_path_dict)
+    players = load_card_play_models(card_play_model_path_dict,device)
     
     if 'weight' in card_play_model_path_dict:
         import douzero.env.game as game
@@ -179,7 +181,7 @@ def data_allocation_per_worker(card_play_data_list, num_workers):
 
     return card_play_data_list_each_worker
 
-def evaluate(landlord, landlord_up, landlord_down, eval_data, num_workers, verbose=False,show_action=True):
+def evaluate(landlord, landlord_up, landlord_down, eval_data, num_workers, verbose=False,show_action=True,device=torch.device("cuda")):
     # Cap the number of workers at 120
     max_workers = 120
     num_workers = min(num_workers, max_workers)
@@ -221,7 +223,7 @@ def evaluate(landlord, landlord_up, landlord_down, eval_data, num_workers, verbo
     for card_paly_data in card_play_data_list_each_worker:
         p = ctx.Process(
                 target=mp_simulate,
-                args=(card_paly_data, card_play_model_path_dict, q, verbose,show_action))
+                args=(card_paly_data, card_play_model_path_dict, q, verbose,show_action,device))
         # Ensure each process uses a reasonable amount of memory
         # This is done by setting a low nice value (higher priority)
         p.daemon = True  # Ensure process terminates when main process does

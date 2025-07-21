@@ -33,8 +33,9 @@ def _load_model(position, model_path):
 
 class DeepAgent:
 
-    def __init__(self, position, model_path):
+    def __init__(self, position, model_path,device=torch.device("cuda")):
         self.model = _load_model(position, model_path)
+        self.device = device
 
     def act(self, infoset):
 
@@ -51,8 +52,10 @@ class DeepAgent:
         if len(infoset.legal_actions) == 1:
             return infoset.legal_actions[0]
 
-        if torch.cuda.is_available():
-            z_batch, x_batch,x_addition_batch = z_batch.cuda(), x_batch.cuda(), x_addition_batch.cuda(),
+        # if torch.cuda.is_available():
+        #     z_batch, x_batch,x_addition_batch = z_batch.cuda(), x_batch.cuda(), x_addition_batch.cuda(),
+        z_batch, x_batch,x_addition_batch = z_batch.to(self.device), x_batch.to(self.device), x_addition_batch.to(self.device),
+        
         y_pred = self.model.forward(z_batch, x_batch, x_addition_batch,return_value=True)['actor_value']
         y_pred = y_pred.detach().cpu().numpy()
 
