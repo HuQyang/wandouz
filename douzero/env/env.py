@@ -103,12 +103,12 @@ class Env:
             done = True
             if self.use_oracle_reward:
                 # oracle dense reward at the end of game
-                reward = self._get_oracle_reward_cached()
+                reward = self._get_oracle_reward_fast()
             else:
                 reward = self._get_reward()
         else:
             # oracle dense reward before game ends
-            reward = self._get_oracle_reward_cached() if self.use_oracle_reward else 0.0
+            reward = self._get_oracle_reward_fast() if self.use_oracle_reward else 0.0
 
         # print("reward: ", reward)
         obs = None if done else get_obs(self.infoset)
