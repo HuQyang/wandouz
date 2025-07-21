@@ -204,7 +204,7 @@ if __name__ == '__main__':
     # 示例对局数据
     from generate_eval_data import generate
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     
     # card_play_data = generate()
 
@@ -300,7 +300,7 @@ if __name__ == '__main__':
 
     ite1 = 773708800
     ite2 = 1342233600
-    ite3 = 2185600
+    ite3 = 3315200
 
     alpha_ite1 = 7913600
     
