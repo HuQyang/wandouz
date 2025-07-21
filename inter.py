@@ -178,12 +178,9 @@ def play_interactive_game(card_play_data, card_play_model_path_dict, human_role=
             # 模型行动
             # action = players[player].act(obs)
             legal_actions = env.get_infoset().legal_actions
-            # print("length of legal actions:", len(legal_actions))
-            # print("legal actions:", legal_actions)
             start_time = time.time()
             action = players[player].act(obs)
             duration = (time.time() - start_time)*1000
-            # print(f"[模型响应时间] {duration:.4f} 毫秒 ")
 
         # 输出结果
         if action != 'pass':
@@ -205,6 +202,12 @@ if __name__ == '__main__':
     # 示例对局数据
     from generate_eval_data import generate
     import os
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ite', type=int, default=32)
+    parser.add_argument('--mode', type=str, default='train')
+    args = parser.parse_args()
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     
     # card_play_data = generate()
@@ -301,14 +304,14 @@ if __name__ == '__main__':
 
     ite1 = 773708800
     ite2 = 1342233600
-    ite3 = 14054400
+    ite3 = 17993600
 
     alpha_ite1 = 7913600
     
 
-    landlord = f'oracle_reward/douzero/landlord{ite3}.ckpt'
-    landlord_up = f'oracle_reward/douzero/landlord_up{ite3}.ckpt'
-    landlord_down = f'oracle_reward/douzero/landlord_down{ite3}.ckpt'
+    landlord = f'oracle_reward/douzero/landlord{args.ite}.ckpt'
+    landlord_up = f'oracle_reward/douzero/landlord_up{args.ite}.ckpt'
+    landlord_down = f'oracle_reward/douzero/landlord_down{args.ite}.ckpt'
 
     # landlord = f'douzero_checkpoints/douzero/landlord_weights_{ite3}.ckpt'
     # landlord_up = f'../beta/douzero_checkpoints/douzero/landlord_up_{alpha_ite1}.ckpt'
@@ -332,4 +335,4 @@ if __name__ == '__main__':
     print("\n 斗地主人机对战开始！你扮演地主。")
     print(f'load ckpt {landlord}')
     # play_interactive_game(card_play_data, card_play_model_path_dict, human_role='landlord_up')
-    play_auto_game(card_play_data, card_play_model_path_dict,mode='train')
+    play_auto_game(card_play_data, card_play_model_path_dict,mode=args.mode)
