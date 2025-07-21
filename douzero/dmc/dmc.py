@@ -54,7 +54,7 @@ def learn(position,
         learner_outputs = model(obs_z, obs_x,obs_x_addition, return_value=True)
         v_pred = learner_outputs['critic_value'].squeeze(-1)  # from critic
         actor_value = learner_outputs['actor_value'].squeeze(-1).clamp(-500, 500)  # from critic
-        print("v_pred", v_pred.shape, actor_value.shape)  # Debugging line to check v_pred shape and values
+        # print("v_pred", v_pred.shape, actor_value.shape)  # Debugging line to check v_pred shape and values
         # loss = compute_loss(learner_outputs['logits'], target)
 
         with torch.no_grad():
