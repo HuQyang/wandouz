@@ -33,9 +33,9 @@ def _load_model(position, model_path):
 
 class DeepAgent:
 
-    def __init__(self, position, model_path,device=torch.device("cuda"),mode='eval'):
+    def __init__(self, position, model_path,mode='eval'):
         self.model = _load_model(position, model_path)
-        self.device = device
+
         self.mode = mode
 
     def act(self, infoset):

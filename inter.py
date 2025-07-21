@@ -64,7 +64,7 @@ def convert_move_type_to_readable(move_type):
     return move_type_dict.get(move_type, 0)
 
 # === 加载模型 ===
-def load_models(card_play_model_path_dict,mode='eval'):
+def load_models(card_play_model_path_dict,mode):
     players = {}
     for position in ['landlord', 'landlord_up', 'landlord_down']:
         model_path = card_play_model_path_dict[position]
@@ -77,7 +77,7 @@ def load_models(card_play_model_path_dict,mode='eval'):
             # else:
             #     print("model_path", model_path)
             #     players[position] = DeepAgent_Alpha(position, model_path)
-            players[position] = DeepAgent(position, model_path,mode)
+            players[position] = DeepAgent(position, model_path,mode=mode)
     return players
 
 # === 自动对局函数 ===
