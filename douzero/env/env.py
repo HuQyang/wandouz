@@ -27,7 +27,7 @@ class Env:
     """
     Doudizhu multi-agent wrapper
     """
-    def __init__(self, objective,show_action=False,use_oracle_reward=False):
+    def __init__(self, objective,show_action=False,use_oracle_reward=True):
         """
         Objective is wp/adp/logadp. It indicates whether considers
         bomb in reward calculation. Here, we use dummy agents.
