@@ -204,7 +204,7 @@ if __name__ == '__main__':
     # 示例对局数据
     from generate_eval_data import generate
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     
     # card_play_data = generate()
 

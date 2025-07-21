@@ -57,8 +57,7 @@ parser.add_argument('--gamma', default=0.99, type=float,
                     help='gamma epsilon')
 parser.add_argument('--gae_lambda', default=0.95, type=float,
                     help='gae_lambda epsilon')
-parser.add_argument('--use_oracle_reward', default=True, type=bool,
-                    help='gae_lambda epsilon')
+
 
 
 parser.add_argument('--show_action', default=False, help='Show action in evaluation mode')
