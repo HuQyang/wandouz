@@ -6,7 +6,7 @@ if __name__ == '__main__':
     flags = parser.parse_args()
     flags.num_actors = 10
     flags.num_threads = 128
-    flags.load_model = False
+    flags.load_model = True
     flags.batch_size = 32
     flags.savedir = "oracle_reward"
     # os.environ["CUDA_VISIBLE_DEVICES"] = "3"
